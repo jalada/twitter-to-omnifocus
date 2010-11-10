@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 use strict;
 use Net::Twitter::Lite;
@@ -29,6 +29,7 @@ close(C);
 ## Set reasonable defaults for no existent parameters,
 ## and die with error message if a required parameter is missing
 $config{last_tweet} = 1 if !defined $config{last_tweet};
+$config{delete_messages} = "yes" if !defined $config{delete_messages};
 die("$0: No Twitter Consumer Key (consumer_key) defined in configuration file\n") if !defined $config{consumer_key};
 die("$0: No Twitter Consumer Secret (consumer_secret) defined in configuration file\n") if !defined $config{consumer_secret};
 
@@ -63,16 +64,19 @@ unless ( $twitter_obj->authorized ) {
 }
 
 
-## Get the tweets from the user timeline since the last recorded tweet
-my $timeline = $twitter_obj->home_timeline({since_id=>$config{last_tweet}});
+## Get the direct messages since the last recorded tweet
+my $directmessages = $twitter_obj->direct_messages({since_id=>$config{last_tweet}});
 die "$@\n" if $@;
 my @tweetsForInbox;
-if ($timeline && @$timeline > 0) {
-  foreach my $tweet (reverse @$timeline) {
+if ($directmessages && @$directmessages > 0) {
+  foreach my $tweet (reverse @$directmessages) {
     print $tweet->{'id'}."\t".$tweet->{'text'}."\n";
     my $asCommand = "tell application \"OmniFocus\" to tell default document\nparse tasks with transport text (\"$tweet->{text}\") without as single task\nend tell";
-	RunAppleScript($asCommand) or die "$0: AppleScript Failed ($@)\n";
+		RunAppleScript($asCommand) or die "$0: AppleScript Failed ($@)\n";
     $config{last_tweet} = $tweet->{'id'};
+		if ($config{delete_messages} eq "yes") {
+			$twitter_obj->destroy_direct_message($tweet->{'id'});
+		}
   }
 }
 
@@ -90,7 +94,7 @@ __END__
 
 =head1 NAME
 
-twitter-to-omnifocus - Read the home timeline of a Twitter user and add the
+twitter-to-omnifocus - Read the direct messages of a Twitter user and add the
 text of any tweets found there to the OmniFocus inbox
 
 =head1 SYNOPSIS
@@ -99,7 +103,7 @@ text of any tweets found there to the OmniFocus inbox
 
 =head1 DESCRIPTION
 
-This application pulls the home timeline of the user corresponding to the consumer key
+This application pulls the direct messages of the user corresponding to the consumer key
 specified in the configuraiton file and adds the text of tweets found there to the OmniFocus
 inbox using AppleScript.
 
@@ -118,12 +122,16 @@ Secret that you get when you register the application at L<http://dev.twitter.co
     consumer_key      abc123abc123abc123
     consumer_secret   789xyz789xyz789xyz789xyz
 
+An additional parameter - delete_messages - controls whether the application deletes direct
+messages after processing them. The default is that it deletes them.
+
 The first time the application runs, you will be prompted to authorize this application 
 with Twitter and enter a PIN number.  When you do that, two other values -- C<access_token> and
 C<access_token_secret> -- will be written to the configuration file.
 
-=head1 AUTHOR
+=head1 AUTHOR(S)
 
+David Somers L<http://github.com/jalada/twitter-to-omnifocus>
 Peter Murray L<http://dltj.org/tag/twitter-to-omnifocus>
 
 =cut

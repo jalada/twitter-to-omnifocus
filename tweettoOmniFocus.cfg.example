@@ -2,3 +2,7 @@
 # When that is done, replace the dummy values below with the ones from Twitter.
 consumer_key      abc123abc123abc123
 consumer_secret   789xyz789xyz789xyz789xyz
+
+# Set to anything but 'yes' to not delete direct messages after they have been processed
+# (yes is default)
+# delete_messages		yes

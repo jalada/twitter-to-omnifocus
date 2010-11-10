@@ -1,6 +1,6 @@
 h1. twitter-to-omnifocus
 
-Read the home timeline of a Twitter user and add the text of any tweets found there to the OmniFocus inbox
+Read the direct messages of a Twitter user and add the text of any tweets found there to the OmniFocus inbox
 
 h2. SYNOPSIS
 
@@ -8,7 +8,7 @@ h2. SYNOPSIS
 
 h2. DESCRIPTION
 
-This application pulls the home timeline of the user corresponding to the consumer key specified in the configuraiton file and adds the text of tweets found there to the OmniFocus inbox using AppleScript.
+This application pulls the home timeline of the user corresponding to the consumer key specified in the configuraiton file and adds the text of tweets found there to the OmniFocus inbox using AppleScript. Requires <pre>Net::Twitter::Lite</pre> and <pre>Mac::Applescript</pre>.
 
 h2. CONFIGURATION FILE
 
@@ -19,9 +19,13 @@ The file consists of configuration directives as key-value pairs separated by wh
 <pre>    consumer_key      abc123abc123abc123
     consumer_secret   789xyz789xyz789xyz789xyz</pre>
 
+An additional parameter -- <pre>delete_messages</pre> -- controls whether the application deletes direct
+messages after processing them. The default is that it deletes them.
+
 The first time the application runs, you will be prompted to authorize this application with Twitter and enter a PIN number. When you do that, two other values -- "access_token" and "access_token_secret" -- will be written to the configuration file.
 
-h2. AUTHOR
+h2. AUTHOR(S)
 
+David Somers, "github repository":http://github.com/jalada/twitter-to-omnifocus
 Peter Murray, "application information":http://dltj.org/tag/twitter-to-omnifocus
 
